@@ -1,0 +1,236 @@
+{{define "index.html"}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OSS指标</title>
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.0.0-rc.1/echarts.min.js"></script>
+<script src="https://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+<style type="text/css">
+.quota{
+    display: inline-block;
+    width: 170px;
+    float: left;
+    border: 1px #61a0a8 dotted;
+    margin: 5px 5px;
+    text-align: left;
+    height: 354px;
+
+
+}
+.quota span {
+    list-style-type: none;
+    height: 50px;
+    border-bottom: #61a0a8 1px dashed;
+    margin: 20px 10px;
+    display: block;
+    font-size: 12px;
+
+}
+.quota .quota-bold{
+    font-weight: bold;
+    font-size: 14px;
+    color: #61a0a8;
+}
+.block-dev{
+    height: 500px;
+}
+</style>
+</head>
+<body>
+<pre style="color:#61a0a8;  font-size: 16px">{{.date}}</pre>
+<div class="block-dev">
+<p style="color: #61a0a8; font-size: 14px; font-weight: bold; text-align: center;">指标汇总</p>
+
+{{range $i, $v := .list}}
+<span class="quota">
+    <span class="quota-bold">{{.Name}}</span>
+    <span class="quota-bold">{{.Count}}</span>
+    {{if gt $v.Day 0.00}}
+    <span style="color: firebrick">日: {{$v.Day}} %</span>
+    {{else if eq $v.Day 0.00}}
+    <span>日: {{$v.Day}} %</span>
+    {{else}}
+    <span style="color: green">日: {{$v.Day}} %</span>
+    {{end}}
+    {{if gt $v.Week 0.00}}
+    <span style="color: firebrick">周: {{$v.Week}} %</span>
+    {{else if eq $v.Week 0.00}}
+    <span>周: {{$v.Week}} %</span>
+    {{else}}
+    <span style="color: green">周: {{$v.Week}} %</span>
+    {{end}}
+    {{if gt $v.Month 0.00}}
+    <span style="color: firebrick">月: {{$v.Month}} %</span>
+    {{else if eq $v.Month 0.00}}
+    <span>月: {{$v.Month}} %</span>
+    {{else}}
+    <span style="color: green">月: {{$v.Month}} %</span>
+    {{end}}
+</span>
+{{end}}
+</div>
+
+<div class="block-dev" id="staChart1" style="height:400px;"></div>
+<div class="block-dev" id="staChart2" style="height:400px;"></div>
+<input id="chart1_name" type="hidden" data-value="{{.emailTrends.Date}}">
+<input id="chart1_value" type="hidden" data-value="{{.emailTrends.Onlines}}">
+<input id="chart2_name" type="hidden" data-value="{{.emailTrendHours.Date}}">
+<input id="chart2_A" type="hidden" data-value="{{.emailTrendHours.A}}">
+<input id="chart2_B" type="hidden" data-value="{{.emailTrendHours.B}}">
+<input id="chart2_C" type="hidden" data-value="{{.emailTrendHours.C}}">
+</body>
+</html>
+<script>
+
+var chart1, chart2;
+$(function() {
+    setChart()
+})
+
+function setChart() {
+    chart1 = echarts.init(document.getElementById("staChart1"));
+    chart2 = echarts.init(document.getElementById("staChart2"));
+    chart1.setOption(option1);
+    chart2.setOption(option2);
+}
+function trimSplit(value) {
+    return value.replace(/^\[|]*/g,"").split(" ");
+}
+var option1 = {
+    title : {
+        text: '近七日分时走势',
+        left:"48%",
+        textStyle:{
+            color:"#61a0a8",
+            fontSize:14,
+        },
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['']
+    },
+    toolbox: {
+        show : false,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : trimSplit($("#chart1_name").data('value'))
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel : {
+                formatter: '{value}'
+            }
+        }
+    ],
+    series : [
+        {
+            name:'活跃数',
+            type:'line',
+            label: {
+                normal: {
+                    show: false,
+                    position: 'top',
+                    textStyle: {
+                        color: ['#d48265']
+                    }
+                }
+            },
+            color:["#91c7ae"],
+            data: trimSplit($("#chart1_value").data('value')),
+        }
+    ]
+};
+
+var option2 = {
+    title : {
+        text: '昨日分时走势',
+        left:"48%",
+        textStyle:{
+            color:"#61a0a8",
+            fontSize:14,
+        },
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['']
+    },
+    toolbox: {
+        show : false,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : trimSplit($("#chart2_name").data('value'))
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            axisLabel : {
+                formatter: '{value}'
+            }
+        }
+    ],
+    series : [
+        {
+            name:'昨日',
+            type:'line',
+            label: {
+                normal: {
+                    show: false,
+                }
+            },
+            data: trimSplit($("#chart2_A").data('value')),
+        },
+        {
+            name:'前日',
+            type:'line',
+            label: {
+                normal: {
+                    show: false,
+                }
+            },
+            data: trimSplit($("#chart2_B").data('value')),
+        },
+         {
+             name:'7日前',
+                 type:'line',
+             label: {
+                 normal: {
+                     show: false,
+                 }
+             },
+             data: trimSplit($("#chart2_C").data('value')),
+         }
+    ]
+};
+</script>
+{{end}}
