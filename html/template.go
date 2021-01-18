@@ -1,4 +1,4 @@
-package email
+package html
 
 import (
 	"datacollectoraiot/models/rsp"
