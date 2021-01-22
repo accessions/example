@@ -24,25 +24,21 @@ type Accession struct {
 	m sync.Mutex
 }
 
-func init()  {
-
-}
-
 func EmailSendOssData (date string) {
 
 	config := setting.EmailOssConfigs
-	_ = exceptionless.Log("OSS数据每日汇报开始: "+time.Now().Format("2006-01-02 15:04:05"), false)
+	_ = exceptionless.Log("开始: "+time.Now().Format("2006-01-02 15:04:05"), false)
 	uri  := fmt.Sprintf(config.Uri, date)
 	upload := fmt.Sprintf(config.Upload, date, url.PathEscape(uri))
 	download := fmt.Sprintf(config.Download, date)
 	uploadResp, err := http.Get(upload)
 	if err != nil {
-		_ = exceptionless.Log("OSS数据汇报: Email Upload Error: "+ err.Error(), false)
+		_ = exceptionless.Log("汇报: Email Upload Error: "+ err.Error(), false)
 	}
 	defer uploadResp.Body.Close()
 	downloadResp, err := http.Get(download)
 	if err != nil {
-		_ = exceptionless.Log("OSS数据汇报: Email Download Error: "+ err.Error(), false)
+		_ = exceptionless.Log("汇报: Email Download Error: "+ err.Error(), false)
 	}
 	defer downloadResp.Body.Close()
 
@@ -51,10 +47,10 @@ func EmailSendOssData (date string) {
 	setting.EmailOss.Body = emailTemplate(parse.Format("2006年01月02日"), uri, download)
 
 	if err = mail.Send(setting.EmailOss); err != nil {
-		_ = exceptionless.Log("OSS数据汇报: Email Send Error: "+ err.Error(), false)
+		_ = exceptionless.Log("汇报: Email Send Error: "+ err.Error(), false)
 	}
 
-	_ = exceptionless.Log("OSS数据每日汇报结束: "+time.Now().Format("2006-01-02 15:04:05"), false)
+	_ = exceptionless.Log("汇报结束: "+time.Now().Format("2006-01-02 15:04:05"), false)
 
 }
 

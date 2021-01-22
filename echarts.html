@@ -1,0 +1,1302 @@
+<style>
+    .self-nav-title {
+        font-size: 32px;
+    }
+    .self-top-nav{
+        display: inline-block;
+        width: 100%;
+    }
+    .self-top-nav .col{
+        height: 144px; float: left; text-align: center; line-height: 3em;
+    }
+    .trend {
+        font-size: 17px;
+        display: inline-block;
+    }
+
+    .demo-table-level_2 td{
+        color: #F26A8C;
+    }
+    .demo-table-level_3 td{
+        color: #E5373B;
+    }
+    .demo-table-level_4 td{
+        color: #A4171B;
+    }
+    .catch-level{
+        width: 46px;
+        height: 18px;
+        border-radius: 6px;
+        float: left;
+    }
+    tr.ivu-table-row-hover td{
+        background-color: #F26A8C;
+        color: #e6e6e6;
+    }
+    .table2 tr.ivu-table-row-hover td{
+        background-color: #3B66FF;
+        color: #e6e6e6;
+    }
+    .title-ps {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+    }
+    .table-command-column {
+        background-color: #0070c0;
+    }
+    .tag-table-2-timeActivateCount {
+        width: 12px;
+        height: 12px;
+        background: #3B66FF;
+        color: #3B66FF;
+        border-radius: 4px;
+    }
+    .tag-table-2-timeActivateRate {
+        width: 12px;
+        height: 12px;
+        background: #00E2FF;
+        color: #00E2FF;
+        border-radius: 4px;
+    }
+    .tag-table-2-onlineCount {
+        width: 12px;
+        height: 12px;
+        background: #00EFB1;
+        color: #00EFB1;
+        border-radius: 4px;
+    }
+    .tag-table-2-onlineRate {
+        width: 12px;
+        height: 12px;
+        background: #FC6C6C;
+        color: #FC6C6C;
+        border-radius: 4px;
+    }
+    .tag-table-tr {
+        display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#ccc;
+    }
+    .tag-table-tr-error {
+        display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#FC6C6C;
+    }
+</style>
+<template>
+    <Card  style="background-color: #f5f7f9">
+        <span class="self-nav-title">实时数据概况</span>
+        <Row :gutter="20">
+            <Col span="6" >
+            <Card :bordered="false" class="self-top-nav" >
+                <div v-for="(infor, i) in delay.rsp_home_top_one" :key="`infor-${i}`">
+                    <Col span="12" class="col">
+                    <p style="font-size: 16px;">{{ infor.title }}</p>
+                    <count-to  :end="infor.count" count-class="count-style" style="display: inline-block;font-size: 28px "/> {{infor.flag}}
+                    </Col>
+                </div>
+            </Card>
+            </Col>
+            <Col span="6" v-for="(infor, i) in delay.rsp_home_top_all" :key="`infor-${i}`">
+            <Card :bordered="false" style="display: inline-block; width: 100%; margin-bottom: 10px; height: 304px">
+                <Row>
+                    <Col span="12"><b style="font-size: 18px">{{ infor.title }}</b></Col>
+                    <Col span="12" style="text-align: right"><Icon v-if="i===0" :type="infor.icon" :color="infor.color[0]" size="28" @click="openModel(infor.name)"></Icon></Col>
+                </Row>
+                <span v-if="infor.count==='-' && i===6" class="count-style"><label></label></span>
+                <span v-if="infor.count==='-' && i!==6" class="count-style"><label>---</label></span>
+                <count-to v-if="infor.count!=='-'" :end="infor.count" count-class="count-style"  class="trend"/> <span v-if="infor.count!=='-'">{{infor.flag}}</span>&nbsp;
+                <count-to v-if="infor.percentage > 0" :end="infor.percentage" :decimals="2" count-class="count-style" style="display: inline-block;font-size: 28px; margin-left:2%"/> <span v-if="infor.percentage > 0">%</span>
+                <ve-chart :data="infor.chart" :type="infor.type" :ref="infor.name" :title="infor.chart.title" :legend="infor.chart.legend" :extend="extend" height="150px" :colors="infor.color"   :loading="infor.chart.chartSettings.loading" :settings="infor.chart.chartSettings"  ></ve-chart>
+                <div style="margin-top: 15px" v-if="i< 6">
+                    <span style="margin-left: 4%;">环比 {{ infor.dqqq }}%<img :src="infor.d_status" height="10" style="margin-left: 1%" ></span>
+                    <span style="margin-left: 4%;">周同比 {{ infor.wqqq }}%<img :src="infor.w_status" height="10" style="margin-left: 1%"></span>
+                    <span style="margin-left: 4%; box-sizing: border-box;">月同比 {{ infor.mqqq }}%<img :src="infor.m_status" height="10" style="margin-left: 1%"></span>
+                </div>
+            </Card>
+            </Col>
+        </Row>
+        <span class="self-nav-title">异常终端概览 <span style="color: #F26A8C; font-size: 27.6px; margin-left: 1.5%">{{stores.home.homeTable3.source.count}}<span style="font-size: 17.6px">台</span></span></span>
+        <Row style="margin-top: 8px">
+            <card>
+                <Row>
+                    <Col span="18">
+                    <Table
+                            :columns="stores.home.homeTable3.columns"
+                            :data="stores.home.homeTable3.data"
+                            ref="tables"
+                            :border="false"
+                            size="small"
+                            :highlight-row="true"
+                            :row-class-name="rowClassName"
+
+                    >
+                        <template slot-scope="{row,index}" slot="level">
+                            <b :style="{'color':stores.home.homeTable3.source.level[row.level].color}">{{stores.home.homeTable3.source.level[row.level].text}}</b>
+                        </template>
+                    </Table>
+                    </Col>
+                    <Col span="6">
+                    <Card style="height: 436px; margin-left: 10px">
+                        <p style="margin-bottom: 10px"><b>异常服务商实时状态</b></p>
+                        <div v-for="(infor, i) in this.stores.home.homeTable3.block">
+                            <Poptip trigger="hover"   :content="infor.orgname" style="float: left" transfer-class-name="demo-table-level_2"  placement="bottom">
+                                <tag class="catch-level" :color="stores.home.homeTable3.source.level[infor.level].color" ></tag>
+                                <div class="api" slot="content">
+                                    <table>
+                                        <thead>
+                                        <tr style="text-align: left">
+                                            <th :style="{'color':stores.home.homeTable3.source.level[infor.level].color}"><i class="title-ps" :style="{'background-color':stores.home.homeTable3.source.level[infor.level].color}" ></i>&nbsp;{{stores.home.homeTable3.source.level[infor.level].text}}</th>
+                                            <th></th>
+                                            <th :style="{'color':stores.home.homeTable3.source.level[infor.level].color}">{{ infor.count }}/台</th>
+                                        </tr>
+                                        </thead>
+                                        <br>
+                                        <tbody>
+                                        <tr>
+                                            <td style="color: #111f2c;">服务商: {{ infor.orgname }}</td>
+                                            <td></td>
+                                            <td><code></code><code></code></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </Poptip>
+
+                        </div>
+                    </Card>
+                    </Col>
+
+                </Row>
+            </card>
+        </Row>
+        <span class="self-nav-title">广告数据概览</span>
+        <Row style="margin-top: 8px">
+            <card>
+                <Row>
+
+                    <Col span="18">
+                    <card>
+                        <ve-chart :data="this.stores.home.homeTable1.chart"   :colors="color" ref="homeTable1" :extend="this.stores.home.homeTable1.chart.extend"   :legend="this.stores.home.homeTable1.chart.legend" :title="this.stores.home.homeTable1.chart.title" height="300px"   :settings="this.stores.home.homeTable1.chart.chartSettings"></ve-chart>
+                    </card>
+                    </Col>
+                    <Col span="6">
+                    <card style="margin-left: 10px">
+                        <ve-chart :data="this.stores.home.homeTable1.pie"   :colors="color" ref="homeTable1_2"  :extend="extend"  height="300px" :settings="this.stores.home.homeTable1.pie.chartSettings"></ve-chart>
+                    </card>
+                    </Col>
+                </Row>
+            </card>
+        </Row>
+        <span class="self-nav-title">服务商TOP</span>
+        <Row style="margin-top: 8px">
+            <card>
+                <Row style="margin-bottom: 5px">
+                    <Col span="12">
+                    服务商激活终端Top10
+                    </Col>
+                    <Col span="12" style="text-align: right">
+                    服务商:
+                    <Select
+                            v-model="stores.home.homeTable2.query.orgId"
+                            @on-change="selectPrivateCustomerList"
+                            placeholder="服务商"
+                            :clearable=true
+                            style="width: 150px; margin-right: 25px;"
+                    >
+                        <Option
+                                v-for="item in stores.home.homeTable2.searchs.customers"
+                                :value="item.value"
+                                :key="item.value"
+                        >{{ item.text }}</Option>
+                    </Select>
+                    日期：
+                    <DatePicker
+                            v-model="stores.home.homeTable2.searchs.selectTime"
+                            :clearable=true
+                            @on-change="Time_Home2_select"
+                            transfer
+                            :value="1" format="yyyy/MM/dd" type="daterange" placement="bottom-end" placeholder="Select date" ></DatePicker>
+
+                    </Col>
+
+                </Row>
+                <Row>
+                    <Col span="24">
+                    <Table
+                            class="table2"
+                            :columns="stores.home.homeTable2.columns"
+                            :data="stores.home.homeTable2.data"
+                            ref="tables"
+                            :border="false"
+                            size="small"
+                            :highlight-row="true"
+                            :row-class-name="rowClassName"
+                    >
+                        <template slot-scope="{row,index}" slot="timeActivateCount"><tag class="tag-table-2-timeActivateCount"></tag><b>{{row.timeActivateCount}}</b></template>
+                        <template slot-scope="{row,index}" slot="timeActivateRate"><tag class="tag-table-2-timeActivateRate"></tag><b>{{row.timeActivateRate}}</b></template>
+                        <template slot-scope="{row,index}" slot="onlineCount"><tag class="tag-table-2-onlineCount"></tag><b>{{row.onlineCount}}</b></template>
+                        <template slot-scope="{row,index}" slot="onlineRate"><tag class="tag-table-2-onlineRate"></tag><b>{{row.onlineRate}}</b></template>
+                        <template slot-scope="{row,index}" slot="action" style="text-align: left">
+                            <ve-bar  width="100%"  :data="stores.home.homeTable2.chartRow[index]" ref="table2" height="28px" :legend="stores.home.homeTable2.chart.legend" :colors="stores.home.homeTable2.chart.color" :extend="stores.home.homeTable2.chart.extend" :settings="stores.home.homeTable2.chart.chartSettings">
+                                <div class="data-empty">-</div>
+                            </ve-bar>
+                        </template>
+                    </Table>
+                    </Col>
+                    <!--        <Col span="6">
+                              <card>
+                                <ve-chart :data="this.stores.home.homeTable2.chart" ref="homeTable2" :colors="color" :legend="this.stores.home.homeTable2.chart.legend" :extend="this.stores.home.homeTable2.chart.extend" :toolbox="toolbox" :loading="this.stores.home.homeTable2.chart.chartSettings.loading" height="459px" :settings="this.stores.home.homeTable2.chart.chartSettings"></ve-chart>
+
+                              </card>
+
+                            </Col>-->
+
+                </Row>
+            </card>
+        </Row>
+
+        <ModelActivate :showFlag="model.activate_flag"   @closeModel="closeModel('activate')" ></ModelActivate>
+    </Card>
+</template>
+
+<script>
+    import 'v-charts/lib/style.css';
+    import 'echarts/lib/component/toolbox'
+    import DzTable from "_c/tables/dz-table.vue";
+    import InforCard from '_c/info-card'
+    import CountTo from '_c/count-to'
+    import Bar from "_c/charts/bar";
+    import {getHomeDevices,getHomeAdPlan, getHomeCatchBlock,getHomeQuoatsAmountTop,getHomeQuoats,getHomeTopQuoats,getCatchSnLs,getHomeQuoatsCols,getHomeQuoatsCatchSn} from "@/api/manage/home";
+    import {getCustomerDrop} from "@/api/manage/profit";
+    import ModelActivate from "@/view/single-page/home/activateModel";
+    import {getDefaultDate,getNowDate} from "@/libs/tools";
+    export default {
+        name: "home",
+        components: {
+            InforCard,
+            CountTo,
+            DzTable,
+            Bar,
+            ModelActivate
+        },
+        data() {
+            this.extend  = {
+                series: {
+                    label: {
+                        normal: {
+                            show: false
+                        }
+                    },
+                },
+                grid: {
+                    x: '1%',
+                    y: '7%',
+                    bottom:0,
+                    top:"10%",
+                    show:true,
+                    borderWidth:'0'
+                },
+                xAxis:{
+                    show:false,
+                },
+            }
+            this.legend = {}
+            this.toolbox = {
+                feature: {
+                    magicType: {type: ['line', 'bar', 'stack', 'histogram']},
+                    //saveAsImage: {}
+                },
+                show: false,
+                orient:'horizontal',
+                right:"5%"
+            }
+            this.m_list  = ['histogram','line', 'ring', 'pie', 'bar','stack']
+            this.m_index = 0
+            this.color   = ['#3A64FC', '#00E0FF','#FC6C6C',  '#c23531', '#bda29a','#2d8cf0', '#546570', '#c4ccd3']
+            return {
+                activateFlag : false,
+                commands: {},
+                model :{
+                    activate_flag : false,
+                },
+                stores: {
+                    home: {
+                        query: {
+                            totalCount: 0,
+                            pageSize: 10,
+                            currentPage: 1,
+                            startTime:"",
+                            endTime:"",
+                            day:30,
+                            sort: [],
+                        },
+                        columns: [],
+                        homeTable1 : {
+                            query: {
+                                startTime:"",
+                                endTime:""
+                            },
+                            data: [],
+                            searchs:{
+                                selectTime : [],
+                            },
+                            chart:{
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+1],
+                                    labelMap: {
+                                        'count': '已投终端数量',
+                                        'showCount': '展示数量',
+                                        'clickCount': 'CPC数量',
+                                        'name':"",
+                                    },
+                                    left:1,
+                                    loading: true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                type: "dotted"
+                                            }
+                                        },
+                                    },
+                                    areaStyle: {
+                                        normal: {
+                                            color: {
+                                                type: 'linear',//设置线性渐变
+                                                x: 0,
+                                                y: 0,
+                                                x2: 0,
+                                                y2: 1,
+                                                colorStops: [{
+                                                    offset: 0, color: 'rgba(57,127,255,.1)' // 0% 处的颜色
+                                                }, {
+                                                    offset: 1, color: '#fff' // 100% 处的颜色
+                                                }],
+
+                                                globalCoord: false // 缺省为 false
+                                            },
+                                            opacity: 0.16,
+                                        },
+                                        emphasis: {
+                                            color: '#4fd6d2',
+                                            lineStyle: {        // 系列级个性化折线样式
+                                                width:2,
+                                                type: 'dotted',
+                                                color: "#4fd6d2" //折线的颜色
+                                            }
+                                        }
+                                    },
+                                    symbolSize:5, //折线点的大小
+                                },
+                                title: {
+                                    show: true,
+                                    text:"",
+                                    textStyle:{
+                                        color:"#6D7A90",
+                                        fontSize:12,
+                                    },
+                                    left: "1%"
+                                },
+                                legend: {
+                                    //orient: 'vertical',
+                                    //y: 'center',
+                                    x: 'right',
+                                    top:0,
+                                    show:true,
+                                    icon: "circle",
+                                },
+                                extend :{
+                                    grid: {
+                                        x: '1%',
+                                        y: '1%',
+                                        bottom:0,
+                                        top:"10%",
+                                        show:'true',
+                                        borderWidth:'0'
+                                    },
+                                    xAxis:{
+                                        show:true,
+                                    },
+                                    tooltip: {
+                                        backgroundColor:'rgba(255,255,255,0.8)',//通过设置rgba调节背景颜色与透明度
+                                        color:'black',
+                                        borderWidth:'1',
+                                        borderColor:'gray',
+                                        textStyle: {
+                                            color: 'black',
+                                        },
+                                        formatter: function (param) {
+
+                                            let ls = [];
+                                            param.forEach((item,i)=>{
+                                                if (item.seriesName==='') {
+                                                    ls[i] = '<tr  style="border-top: 1px solid #ccc;"><td style="text-align: left;padding: 5px"><span class="tag-table-tr"></span> 投放行业</td><td style="text-align: right">'+(item.data[1] ? item.data[1] : '不限')+'</td></tr>'
+                                                } else {
+                                                    ls[i] = '<tr><td style="text-align: left; padding: 5px">'+item.marker + item.seriesName + ' </td><td style="text-align: right">'+ item.data[1]+' </td></tr>';
+                                                }
+                                            });
+                                            ls.push('<tr><td style="text-align: left; padding: 5px"><span class="tag-table-tr"></span> '+param[0].name+'</td><td style="text-align: right"></td></tr>')
+                                            return '<table width="100%"  style="border-collapse:collapse; border-spacing: 20px 30px;">'+ls.join(' ')+'</table>';
+                                            /* '<span style="color: #00E2FF">日期: ' + param.name + '</span><hr size=1 style="margin: 3px 0">',*/
+
+                                        }
+                                    }
+                                },
+                                columns: ['date', 'count', 'showCount', 'clickCount','name'],
+                                rows: [],
+                            },
+                            pie:{
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+3],
+                                    //roseType: 'radius',
+                                    labelMap: {},
+                                    loading: false,
+                                },
+                                title: {
+                                    text:"",
+                                    textStyle:{
+                                        color:"#61a0a8",
+                                        fontSize:14,
+                                    },
+                                    right: "50%"
+                                },
+                                columns: ['name', 'count'],
+                                rows: [
+                                    { 'name': '可投放终端数量', 'count': 1393 },
+                                    { 'name': '在投放终端数量', 'count': 2000 },
+                                ],
+                            },
+                        },
+                        homeTable2 : {
+                            query: {
+                                startTime:"",
+                                endTime:"",
+                                orgId:0,
+                                chart:""
+                            },
+                            columns:[
+                                {title: "服务商/合作伙伴名称",  key: "name", width:230},
+                                {title: "总激活数(台)",  key: "activateCount"},
+                                {title: "总激活率%",  key: "activateRate"},
+                                {title: "总终端数(台)",  key: "count"},
+                                {title: "单位时间内激活数(台)",  key: "timeActivateCount", slot: 'timeActivateCount'},
+                                {title: "单位时间内激活率%",  key: "timeActivateRate", slot: 'timeActivateRate'},
+                                {title: "在线终端(台)",  key: "onlineCount", slot: 'onlineCount'},
+                                {title: "在线率%",  key: "onlineRate",  slot: 'onlineRate'},
+                                {title: ".", align: "left", key: "action", className: "table-command-column", slot: "action", width: 700}
+                            ],
+                            data: [],
+                            searchs:{
+                                selectTime : [],
+                                customers:[]
+                            },
+                            chart:{
+                                chartSettings :  {
+                                    stack: {
+                                        'xxx': ['timeActivateCount', 'timeActivateRate','onlineCount','onlineRate']
+                                    },
+                                    itemStyle: {
+                                        normal: {
+                                            //barBorderRadius: [5,5,5,5],
+                                        },
+                                    },
+                                    labelMap: {
+                                        'name': '',
+                                    },
+                                    showBackground: true,
+
+                                },
+                                color:['#3A64FC', '#00E0FF','#00EFB1','#FC6C6C'],
+                                legend: {
+                                    show:false,
+                                },
+
+                                extend :{
+                                    label: {
+                                        show: true,
+                                        position: 'insideBottom',
+                                        //distance: 1
+                                        //formatter:['{激活数}: {@activateCount}'],
+                                    },
+                                    grid: {
+                                        left:1,
+                                        show:false,
+                                        //right:"1%"
+                                    },
+                                    xAxis:{
+                                        show:false,
+                                    },
+                                    yAxis:{
+                                        show:false,
+                                    },
+                                    tooltip: {
+                                        triggerOn: "none",
+                                        alwaysShowContent: true,
+                                        position: function(pt) {
+                                            return [pt[0], 130];
+                                        },
+                                        show: false
+                                    },
+                                },
+                                columns: ['-',  'timeActivateCount', 'timeActivateRate', 'onlineCount', 'onlineRate'],
+                            },
+                            chartRow:[],
+                        },
+                        homeTable3 : {
+                            columns:[
+                                /*{title: "ID",  key: "id"},*/
+                                {title: "异常类型",  key: "level" , slot:"level"},
+                                {title: "SN",  key: "serialnum" , render: (h, params) => {
+                                        return h('div', [
+                                            h('b', {
+                                                props: {
+                                                    type: 'error',
+                                                    size: 'small'
+                                                },
+                                                class:"tag-table-tr-error",
+                                                style:{
+                                                    backgroundColor: this.stores.home.homeTable3.source.level[params.row.level].color
+                                                }
+                                            }),
+                                            h('a', {
+                                                props: {
+                                                    type: 'error',
+                                                    size: 'small'
+                                                },
+                                                style: {
+                                                    color:this.stores.home.homeTable3.source.level[params.row.level].color,
+                                                },
+
+                                                on: {
+                                                    click: () => {
+                                                        window.open("/#/warning/businessWarningDetail?businessWarningId="+params.row.id)
+                                                        //this.showTerminalInfoView(params.row)
+                                                    }
+                                                }
+                                            }, params.row.serialnum)
+                                        ])
+                                    }},
+                                {title: "故障所在地",  key: "address"},
+                                {title: "所属服务商",  key: "orgname"},
+                            ],
+                            source:{
+                                level:[
+                                    { text : "正常", color : "#E0E3E8", value: 0},
+                                    { text : "普通", color : "#E0E3E8", value: 1},
+                                    { text : "一般", color : "#F26A8C", value: 2},
+                                    { text : "高级", color : "#E5373B", value: 3},
+                                    { text : "极高", color : "#A4171B", value: 4},
+                                ],
+                                count: 0,
+                            },
+                            data: [],
+                            block:[],
+                            searchs:{},
+                            tempRow:[],
+                        },
+                        homeTable4 : {
+                            query: {
+                                selectDate : "",
+                                totalCount: 0,
+                                pageSize: 10,
+                                currentPage: 1,
+                                orgIds :[],
+                                dayDate:"",
+                                monthDate:"",
+                            },
+                            columns:[
+                                {title: "服务商",  key: "orgName"},
+                                {title: "负责人",  key: "nickName", render: (h, params) => {
+                                        return h('div', [
+                                            h('a', {
+                                                props: {
+                                                    type: 'primary',
+                                                    size: 'small'
+                                                },
+                                                style: {
+                                                    marginRight: '5px'
+                                                },
+                                                on: {
+                                                    click: () => {
+                                                        window.open("/#/kpi/kpiList?nick_name="+params.row.nickName)
+                                                    }
+                                                }
+                                            }, params.row.nickName)
+                                        ])
+                                    }},
+                                {title: "已达成",  key: "completeNum"},
+                                {title: "未达成",  key: "unCompleteNum"},
+                                {title: "今日在线",  key: "todayOnlineCount"},
+                                {title: "今日新增",  key: "todayNewActivateCount"},
+                                {title: "本月新增",  key: "monthNewActivateCount"},
+                            ],
+                            data: [],
+                            searchs:{},
+                            chart:{},
+                        },
+                        homeTable5 : {
+                            query: {
+                                startTime:"",
+                                endTime:"",
+                                orgId:0
+                            },
+                            columns:[
+                                {title: "服务商/合作伙伴名称",  key: "name"},
+                                {title: "机器收入",  key: "count"},
+                                {title: "广告收入",  key: "activateCount"},
+                                {title: "总计",  key: "onlineSnCount"},
+                            ],
+                            data: [],
+                            searchs:{
+                                selectTime : [],
+                                customers:[]
+                            },
+                            chart:{
+                                chartSettings : {
+                                    type: this.m_list[this.m_index],
+                                    labelMap: {
+                                        'machineEarnings': '机器收入',
+                                        'adEarnings': '广告收入',
+                                        'totalEarnings': '总计',
+                                    },
+                                    loading: false
+                                },
+                                columns: ['totalEarnings','machineEarnings', 'adEarnings'],
+                                rows: [],
+                            },
+                        },
+                        data: [],
+                    },
+                },
+                sources: {
+                    searchSource: {}
+                },
+                delay : {
+                    // 指标
+                    rsp_home_top_one: [
+                        {title: "已分配终端数量", flag:"台", count:0},
+                        {title: "已签约服务商数量", flag:"家", count:0},
+                        {title: "未激活终端数量", flag:"台", count:0},
+                        {title: "已签约商户数量", flag:"家", count:0},
+                    ],
+                    rsp_home_top_all : [
+                        {title: "激活终端数量/激活率", name:"activate_count", type:1, flag:"台", icon: 'ios-aperture-outline', count: 0, percentage:null, prev:0,  dqqq: 0, wqqq: 0, mqqq: 0, d_status: 'images/page/line.png',w_status: 'images/page/line.png',m_status: 'images/page/line.png',
+                            color: ['#3B66FF','#00F1BA'],
+                            chart : {
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+1],
+                                    labelMap: {
+                                        'activate_count': '激活数',
+                                        'activate_rate': '激活率',
+                                    },
+                                    loading:true,
+                                    area: true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                // type: "dotted","solid"
+                                                width:1
+                                            }
+                                        },
+                                    },
+                                    areaStyle: {
+                                        normal: {
+                                            color: {
+                                                type: 'linear',//设置线性渐变
+                                                x: 0,
+                                                y: 0,
+                                                x2: 0,
+                                                y2: 1,
+                                                colorStops: [{
+                                                    offset: 0, color: 'rgba(57,127,255,.1)' // 0% 处的颜色
+                                                }, {
+                                                    offset: 1, color: '#fff' // 100% 处的颜色
+                                                }],
+                                                globalCoord: false // 缺省为 false
+                                            },
+                                            opacity: 0.16,
+                                        },
+                                        emphasis: {
+                                            color: '#4fd6d2',
+                                            lineStyle: {        // 系列级个性化折线样式
+                                                width:2,
+                                                type: 'dotted',
+                                                color: "#4fd6d2" //折线的颜色
+                                            }
+                                        }
+                                    },
+                                },
+                                legend: {
+                                    right: "80%",
+                                    show:false,
+                                },
+                                columns: ['date', 'activate_count', 'activate_rate'],
+                                rows: [],
+
+                            }
+                        },
+                        {title: "在线终端数量/在线率", name:"online_count", type:0,flag:"台", icon: 'ios-aperture-outline', count: 0, percentage:null, prev:0, dqqq: 0, wqqq: 0, mqqq: 0, d_status: 'images/page/line.png',w_status: 'images/page/line.png',m_status: 'images/page/line.png',
+                            color: ['#3B66FF','#00F1BA'],
+                            chart : {
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+1],
+                                    labelMap: {
+                                        'online_count': '在线终端数量',
+                                        'online_rate': '在线率',
+                                    },
+                                    loading:true,
+                                    area: true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                //type: "dotted",
+                                                width:1
+                                            }
+                                        },
+                                    },
+                                    areaStyle: {
+                                        normal: {
+                                            color: {
+                                                type: 'linear',
+                                                x: 0,
+                                                y: 0,
+                                                x2: 0,
+                                                y2: 1,
+                                                colorStops: [{
+                                                    offset: 0, color: 'rgba(57,127,255,.1)'
+                                                }, {
+                                                    offset: 1, color: '#fff'
+                                                }],
+                                                globalCoord: false
+                                            },
+                                            opacity: 0.16,
+                                        },
+                                    },
+                                },
+                                legend: {
+                                    right: "80%",
+                                    show:false,
+                                },
+                                columns: ['date', 'online_count','online_rate'],
+                                rows: []
+                            }},
+                        {title: "异常终端数量", name:"catch_count", type:2, flag:"台", icon: 'ios-aperture-outline', count: 0, percentage:null,prev:0,  dqqq: 0, wqqq: 0, mqqq: 0, d_status: 'images/page/line.png',w_status: 'images/page/line.png',m_status: 'images/page/line.png',color: ['#FE5578'],
+                            chart : {
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+1],
+                                    labelMap: {
+                                        'catch_count': '异常终端数量',
+                                    },
+                                    area: false,
+                                    loading:true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                //type: "dotted",
+                                                width:1
+                                            }
+                                        },
+                                    },
+                                    areaStyle: {
+                                        normal: {
+                                            color: {
+                                                type: 'linear',
+                                                x: 0,
+                                                y: 0,
+                                                x2: 0,
+                                                y2: 1,
+                                                colorStops: [{
+                                                    offset: 0, color: '#FE5578'
+                                                }, {
+                                                    offset: 1, color: '#fff'
+                                                }],
+                                                globalCoord: false
+                                            },
+                                            opacity: 0.16,
+                                        },
+                                    },
+                                },
+                                legend: {
+                                    right: "80%",
+                                    show:false,
+                                },
+                                columns: ['date', 'catch_count'],
+                                rows: []
+                            }},
+                        {title: "交易终端数量", name:"deal_sn_count", type:1,flag:"台", icon: 'ios-aperture-outline', count: 0, percentage:null,prev:0,  dqqq: 0, wqqq: 0, mqqq: 0, d_status: 'images/page/line.png',w_status: 'images/page/line.png',m_status: 'images/page/line.png',
+                            color: ['#3B66FF','#00F1BA'],
+                            chart : {
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+1],
+                                    labelMap: {
+                                        'deal_sn_count': '交易终端数量',
+                                    },
+                                    area: true,
+                                    loading:true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                //type: "dotted",
+                                                width:1
+                                            }
+                                        },
+                                    },
+                                    areaStyle: {
+                                        normal: {
+                                            color: {
+                                                type: 'linear',
+                                                x: 0,
+                                                y: 0,
+                                                x2: 0,
+                                                y2: 1,
+                                                colorStops: [{
+                                                    offset: 0, color: 'rgba(57,127,255,.1)'
+                                                }, {
+                                                    offset: 1, color: '#fff'
+                                                }],
+                                                globalCoord: false
+                                            },
+                                            opacity: 0.16,
+                                        },
+                                    },
+                                },
+                                legend: {
+                                    right: "80%",
+                                    show:false,
+                                },
+                                columns: ['date', 'deal_sn_count'],
+                                rows: []
+                            }},
+                        {title: "交易笔数", name:"deal_count", type:2,flag:"笔", icon: 'ios-aperture-outline', count: '-', percentage:null,prev:0,  dqqq: 0, wqqq: 0, mqqq: 0, d_status: 'images/page/line.png',w_status: 'images/page/line.png',m_status: 'images/page/line.png',color: ['#00F1BA'],
+                            chart : {
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+1],
+                                    labelMap: {
+                                        'deal_count': '交易笔数',
+                                    },
+                                    area: false,
+                                    loading:true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                //type: "dotted",
+                                                width:1
+                                            }
+                                        },
+                                    },
+                                    areaStyle: {
+                                        normal: {
+                                            color: {
+                                                type: 'linear',
+                                                x: 0,
+                                                y: 0,
+                                                x2: 0,
+                                                y2: 1,
+                                                colorStops: [{
+                                                    offset: 0, color: '#00F1BA'
+                                                }, {
+                                                    offset: 1, color: '#fff'
+                                                }],
+                                                globalCoord: false
+                                            },
+                                            opacity: 0.16,
+                                        },
+                                    },
+                                },
+                                legend: {
+                                    right: "80%",
+                                    show:false,
+                                },
+                                columns: ['date', 'deal_count'],
+                                rows: []
+                            }},
+                        {title: "交易金额/平均交易金额", name:"deal_amount", type:3,flag:"元", icon: 'ios-aperture-outline', count: '-',percentage:null,  prev:0,  dqqq: 0, wqqq: 0, mqqq: 0, d_status: 'images/page/line.png',w_status: 'images/page/line.png',m_status: 'images/page/line.png',color: ['#3B66FF','#00F1BA'],
+                            chart : {
+                                chartSettings : {
+                                    type: this.m_list[this.m_index+1],
+                                    labelMap: {
+                                        'deal_amount': '交易金额',
+                                        'deal_amount_avg': '平均交易金额',
+                                    },
+                                    loading:true,
+                                    area: true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                //type: "dotted",
+                                                width:1
+                                            }
+                                        },
+                                    },
+                                    areaStyle: {
+                                        normal: {
+                                            color: {
+                                                type: 'linear',
+                                                x: 0,
+                                                y: 0,
+                                                x2: 0,
+                                                y2: 1,
+                                                colorStops: [{
+                                                    offset: 0, color: 'rgba(57,127,255,.1)'
+                                                }, {
+                                                    offset: 1, color: '#fff'
+                                                }],
+                                                globalCoord: false
+                                            },
+                                            opacity: 0.16,
+                                        },
+                                    },
+                                },
+                                legend: {
+                                    right: "80%",
+                                    show:false,
+                                },
+                                columns: ['date', 'deal_amount','deal_amount_avg'],
+                                rows: [],
+                                yAxis : [
+                                    {
+                                        type : 'value',
+                                        axisLabel: {
+                                            formatter: function (value, index) {
+                                                return value.toFixed(2);
+                                            }
+                                        }
+                                    }
+                                ],
+                            }},
+                        {title: "交易排名TOP10",   name:"deal_top", type:3, flag:"台", icon: 'ios-aperture-outline', count: '-', percentage:null,prev:0,  dqqq: 0, wqqq: 0, mqqq: 0, d_status: 'images/page/line.png',w_status: 'images/page/line.png',m_status: 'images/page/line.png',color: ['#6284FF'],
+                            chart : {
+                                chartSettings : {
+                                    type: this.m_list[this.m_index],
+                                    labelMap: {
+                                        'count': '交易数',
+                                    },
+                                    area: false,
+                                    loading:true,
+                                    itemStyle: {
+                                        normal: {
+                                            //color: '#FFAE00',
+                                            lineStyle: {
+                                                // color: '#397FFF',
+                                                //type: "dotted",
+                                                width:1
+                                            }
+                                        },
+                                    },
+                                    /*  yAxis : [
+                                        {
+                                          type : 'value',
+                                          axisLabel: {
+                                            formatter: function (value, index) {
+                                              return value.toFixed(2);
+                                            }
+                                          }
+                                        }
+                                      ],*/
+                                },
+                                legend: {
+                                    right: "80%",
+                                    show:false,
+                                },
+                                columns: ['name', 'count'],
+                                rows: [],
+                            }},
+                    ],
+                },
+            }
+        },
+        methods: {
+            Time_Home1_select () {
+                this.stores.home.homeTable1.query.startTime =   getDefaultDate(this.stores.home.homeTable1.searchs.selectTime[0])
+                this.stores.home.homeTable1.query.endTime   = getNowDate(this.stores.home.homeTable1.searchs.selectTime[1])
+                this.pirvateHomeAdplanLine();
+            },
+            Time_Home2_select() {
+                this.stores.home.homeTable2.query.startTime = this.getPassDates(this.stores.home.homeTable2.searchs.selectTime[0])
+                this.stores.home.homeTable2.query.endTime   = this.getNowDate(this.stores.home.homeTable2.searchs.selectTime[1])
+                this.privateHomeLoadDeviceList();
+
+            },
+            loadHomeInit() {
+                // top指标
+                this.privateHomeLoadTopQuoats();
+                // 环比
+                this.quoats();
+                // 加载异常SN
+                this.privateHomeLoadCatchSnLs("?limit=10");
+                this.privateHomeLoadCatchSnBlock();
+                // 加载广告计划走势
+                this.pirvateHomeAdplanLine();
+                // 加载服务商列表,柱图
+                this.selectPrivateCustomerList();
+                // kpi
+                //this.privateHomeLoadOperator();
+                //this.$emit('on-coll-change', true)
+
+            },
+            // 指标
+            quoats() {
+                this.quoatsHomeQuoatActivate();
+                this.quoatsHomeQuoatCatchSn();
+                this.quoatsHomeQuoatOnline();
+                this.quoatsHomeQuoatDealSn();
+                this.quoatsHomeQuoatDeals();
+                this.quoatsHomeQuoatDealMoney();
+            },
+            // 指标：激活环比
+            quoatsHomeQuoatActivate() {
+                getHomeQuoatsCols("?name=activated_day").then(res => {
+                    //this.$refs['0'].echarts.resize();
+                    this.privateQuoatLoad(0, res.data.data)
+                });
+            },
+            // 指标：在线终端环比
+            quoatsHomeQuoatOnline() {
+                getHomeQuoatsCols("?name=online_device_total").then(res => {
+                    this.privateQuoatLoad(1, res.data.data)
+                });
+            },
+            /* // 指标：在线率环比
+             quoatsHomeQuoatOnlineRate() {
+               getHomeQuoatsCols("?name=online_rate").then(res => {
+                 this.privateQuoatLoad(1, res.data.data)
+               });
+             },*/
+            // 指标：异常终端环比
+            quoatsHomeQuoatCatchSn(){
+                getHomeQuoatsCatchSn().then(res => {
+                    this.privateQuoatLoad(2, res.data.data)
+                });
+            },
+            // 指标：交易终端环比
+            quoatsHomeQuoatDealSn() {
+                getHomeQuoatsCols("?name=ad_device_total").then(res => {
+                    this.privateQuoatLoad(3, res.data.data)
+                });
+            },
+            // 指标：交易笔数环比
+            quoatsHomeQuoatDeals() {
+                getHomeQuoatsCols("?name=ad_push_total").then(res => {
+                    this.privateQuoatLoad(4, res.data.data)
+                });
+            },
+            // 指标：交易金额环比
+            quoatsHomeQuoatDealMoney() {
+                getHomeQuoatsCols("?name=deal_amount").then(res => {
+                    this.privateQuoatLoad(5, res.data.data)
+                });
+            },
+            // 服务商交易top10
+            quoatsHomeAmountTop10() {
+                getHomeQuoatsAmountTop("").then(res =>{
+                    this.delay.rsp_home_top_all[6].chart.rows = res.data.data;
+                    this.delay.rsp_home_top_all[6].chart.chartSettings.loading = false;
+                    this.$refs[this.delay.rsp_home_top_all[6].name][0].echarts.resize()
+                })
+            },
+            // top实时指标
+            privateHomeLoadTopQuoats(){
+                getHomeTopQuoats("").then(res =>{
+                    let data = res.data.data;
+                    this.delay.rsp_home_top_one[0].count = data.count;
+                    this.delay.rsp_home_top_one[1].count = data.customerCount;
+                    this.delay.rsp_home_top_one[2].count = data.noActivateCount;
+                    this.delay.rsp_home_top_one[3].count = data.merchantCount;
+
+                    this.delay.rsp_home_top_all[0].count = data.activate_count;
+                    this.delay.rsp_home_top_all[0].percentage = (data.activate_count / data.allCount * 100).toFixed(2);
+                    this.delay.rsp_home_top_all[1].count = data.online_count;
+                    this.delay.rsp_home_top_all[1].percentage = data.online_rate;
+                    this.delay.rsp_home_top_all[2].count = data.catch_count;
+                    this.delay.rsp_home_top_all[3].count = data.deal_sn_count;
+                    this.delay.rsp_home_top_all[4].count = data.deal_count;
+                    this.delay.rsp_home_top_all[5].count = '-';
+                    //this.delay.rsp_home_top_all[5].percentage = data.deal_count_avg ? data.deal_count_avg.toFixed(2) : 0;
+                    this.privateHomeLoadQuoatsChart();
+
+                })
+            },
+            // top近7日走势
+            privateHomeLoadQuoatsChart() {
+                getHomeQuoats("").then(res =>{
+                    var data = res.data.data;
+                    data.forEach((item, i) => {
+                        this.delay.rsp_home_top_all[0].chart.rows.push({
+                            'date': item.date,
+                            'activate_count': item.activate_count,
+                            'activate_count_rate' : item.activate_count_rate > 0 ? item.activate_count_rate:0
+                        })
+                        this.delay.rsp_home_top_all[0].chart.chartSettings.loading = false;
+                        this.delay.rsp_home_top_all[1].chart.rows.push({
+                            'date': item.date,
+                            'online_count': item.online_count,
+                            'online_rate': item.online_rate,
+                        })
+                        this.delay.rsp_home_top_all[1].chart.chartSettings.loading = false;
+                        this.delay.rsp_home_top_all[2].chart.rows.push({
+                            'date': item.date,
+                            'catch_count': item.catch_count
+                        })
+                        this.delay.rsp_home_top_all[2].chart.chartSettings.loading = false;
+                        this.delay.rsp_home_top_all[3].chart.rows.push({
+                            'date': item.date,
+                            'deal_sn_count': item.deal_sn_count
+                        })
+                        this.delay.rsp_home_top_all[3].chart.chartSettings.loading = false;
+                        this.delay.rsp_home_top_all[4].chart.rows.push({
+                            'date': item.date,
+                            'deal_count': item.deal_count,
+                            'deal_money_avg': item.deal_amount_avg
+                        })
+                        this.delay.rsp_home_top_all[4].chart.chartSettings.loading = false;
+                        this.delay.rsp_home_top_all[5].chart.rows.push({
+                            'date': item.date,
+                            'deal_amount': item.deal_amount,
+                            'deal_money_avg': item.deal_amount_avg
+                        })
+                        this.delay.rsp_home_top_all[5].chart.chartSettings.loading = false;
+                    });
+                    this.quoatsHomeAmountTop10();
+
+                })
+
+            },
+
+            // 环比值
+            privateQuoatVals(prev, next) {
+                let val = (prev - next) / next
+                return val.toFixed(2)
+            },
+            // 环比
+            privateQuoatLoad(i, data) {
+                let day = data.prev_yesterday_count > 0 ? this.privateQuoatVals(data.yesterday_count, data.prev_yesterday_count) : 0;
+                this.delay.rsp_home_top_all[i].d_status = this.privateQQQImg(day)
+                this.delay.rsp_home_top_all[i].dqqq = Math.abs(day)
+                let week = data.prev_week_count > 0 ? this.privateQuoatVals(data.week_count, data.prev_week_count) : 0;
+                this.delay.rsp_home_top_all[i].w_status = this.privateQQQImg(week)
+                this.delay.rsp_home_top_all[i].wqqq = Math.abs(week)
+                let month = data.prev_month_count > 0 ? this.privateQuoatVals(data.month_count, data.prev_month_count) : 0;
+                this.delay.rsp_home_top_all[i].m_status = this.privateQQQImg(month)
+                this.delay.rsp_home_top_all[i].mqqq = Math.abs(month)
+                this.$refs[this.delay.rsp_home_top_all[i].name][0].echarts.resize()
+            },
+            // 环比箭头
+            privateQQQImg(qqq) {
+                var up   = 'images/page/up.png'
+                var down = 'images/page/down.png'
+                var line = 'images/page/line.png'
+                if(qqq > 0) {
+                    return  up
+                } else if(qqq < 0) {
+                    return  down
+                } else {
+                    return line
+                }
+            },
+            // 广告计划列表
+            pirvateHomeAdplanLine() {
+
+                getHomeAdPlan(this.stores.home.homeTable1.query).then(res => {
+                    this.stores.home.homeTable1.chart.rows = res.data.data;
+                    this.stores.home.homeTable1.chart.chartSettings.loading = false;
+                    this.$refs['homeTable1'].echarts.resize()
+                })
+
+            },
+            // 服务商SN使用列表
+            privateHomeLoadDeviceList() {
+                getHomeDevices(this.stores.home.homeTable2.query).then(res => {
+                    this.stores.home.homeTable2.data = res.data.data;
+                    let columns = this.stores.home.homeTable2.chart.columns;
+                    let tmp = [];
+                    res.data.data.forEach((item,i)=>{
+                        tmp[i] = {
+                            columns:columns,
+                            rows: [item]
+                        }
+                    })
+                    this.stores.home.homeTable2.chartRow = tmp;
+                    this.stores.home.homeTable2.chart.chartSettings.loading = false
+                    // this.$refs['table2'].echarts.resize()
+                })
+            },
+            // 异常终端列表
+            privateHomeLoadCatchSnLs(limit){
+                getCatchSnLs(limit).then(res => {
+                    this.stores.home.homeTable3.data = res.data.data;
+                    this.stores.home.homeTable3.source.count = res.data.data === null ? 0 : res.data.data[0]['count'];
+                    //this.$refs['homeTable3_1'].echarts.resize()
+                });
+            },
+            // 异常终端等级块
+            privateHomeLoadCatchSnBlock(limit){
+                getHomeCatchBlock().then(res => {
+                    this.stores.home.homeTable3.block = res.data.data;
+                });
+            },
+            // 选择服务商
+            selectPrivateCustomerList() {
+                getCustomerDrop().then(res => {
+                    this.stores.home.homeTable2.searchs.customers = res.data.data;
+                    this.privateHomeLoadDeviceList()
+                });
+            },
+            rowClassName (row, index, i) {
+                if (this.stores.home.homeTable3.tempRow.serialnum === row.serialnum) {
+                    return 'table-bg-level';
+                } else {
+                    return 'demo-table-level_'+row.level;
+                }
+            },
+            // activate
+            openModel(name){
+                /// alert(name)
+                switch (name) {
+                    case 'activate_count':
+                        this.model.activate_flag = true;
+                        break;
+                }
+            },
+            closeModel(name){
+                this.model.activate_flag = false;
+                //window.reload();
+            },
+
+        },
+
+        mounted() {
+            this.stores.home.homeTable1.searchs.selectTime[0] = this.stores.home.homeTable1.query.startTime = getDefaultDate();
+            this.stores.home.homeTable1.searchs.selectTime[1] = this.stores.home.homeTable1.query.endTime = getNowDate();
+            this.stores.home.homeTable2.searchs.selectTime[0] = this.stores.home.homeTable2.query.startTime = getDefaultDate();
+            this.stores.home.homeTable2.searchs.selectTime[1] = this.stores.home.homeTable2.query.endTime = getNowDate();
+            this.loadHomeInit()
+
+        },
+
+    };
+
+</script>
+
+<style lang="less">
+    .count-style {
+        font-size: 40px;
+    }
+
+    .menuClass {
+        height: 40px;
+        margin-bottom: 5px;
+        line-height: 40px;
+    }
+</style>
