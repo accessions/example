@@ -1,0 +1,1095 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "ToAIoT Service",
+        "title": "ToAIoT Service",
+        "contact": {},
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/auth/secret": {
+            "get": {
+                "description": "Secret生成",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "Secret生成",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "包名",
+                        "name": "Pkg",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/deals": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "上报交易数据",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/clientReq.ClientAppDealsReq"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/exception": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "上报异常数据",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/clientReq.ExceptionReq"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/hardwarehealth": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "上报硬件健康信息",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/clientReq.ClientAppHardwareHealthReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/hardwares": {
+            "post": {
+                "description": "app初始化时上报终端硬件信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "上报硬件信息",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/clientReq.ClientAppHardwareReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/healths": {
+            "get": {
+                "description": "每5分钟轮询一次接口，检测下发指令集",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "轮询心跳包",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/softwarehealth": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "上报软件健康",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/clientReq.ClientAppSoftwareHealthReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/client/switch": {
+            "post": {
+                "description": "切换广告模式:MPM,CPM,APP打开，关闭",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AppService"
+                ],
+                "summary": "切换广告模式",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/clientReq.AppSwitchReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/devicewechatuser": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ProfitService"
+                ],
+                "summary": "设备绑定微信号",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dbModel.Profit_device_wechat"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/getSyncNode": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RelationService"
+                ],
+                "summary": "同步节点信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/getSyncNodeLine": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RelationService"
+                ],
+                "summary": "同步关系链与节点信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/h5sub": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdsService"
+                ],
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/aiotReq.AdSubReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/os/getDeviceStat": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OsService"
+                ],
+                "summary": "获取设备统计",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The object content",
+                        "name": "date",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/sub": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdsService"
+                ],
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/aiotReq.AdSubReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/supplierChangePush": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ProfitService"
+                ],
+                "summary": "供号人变更推送",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/supplierReq.SupplierChangeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/wechatChangePush": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ProfitService"
+                ],
+                "summary": "微信号变更推送",
+                "parameters": [
+                    {
+                        "description": "The object content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wechatReq.WechatChangeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "aiotReq.AdSubReq": {
+            "type": "object",
+            "properties": {
+                "AppKey": {
+                    "type": "string"
+                },
+                "Nonce": {
+                    "type": "string"
+                },
+                "Sign": {
+                    "type": "string"
+                },
+                "SignMethod": {
+                    "type": "string"
+                },
+                "Timestamp": {
+                    "type": "integer"
+                },
+                "Version": {
+                    "type": "string"
+                },
+                "ads": {
+                    "type": "string"
+                },
+                "deviceSn": {
+                    "type": "string"
+                },
+                "lineId": {
+                    "type": "integer"
+                },
+                "mId": {
+                    "type": "string"
+                },
+                "tm": {
+                    "type": "integer"
+                }
+            }
+        },
+        "clientReq.AppSwitchReq": {
+            "type": "object",
+            "properties": {
+                "m": {
+                    "description": "MPM,CPM",
+                    "type": "string"
+                },
+                "pkg": {
+                    "type": "string"
+                },
+                "report_time": {
+                    "type": "string"
+                },
+                "s": {
+                    "description": "开启：1. 关闭：2",
+                    "type": "integer"
+                },
+                "sn": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "clientReq.ClientAppDealsReq": {
+            "type": "object",
+            "properties": {
+                "ct": {
+                    "description": "币种",
+                    "type": "string"
+                },
+                "dh": {
+                    "description": "交易时长/毫秒",
+                    "type": "integer"
+                },
+                "dm": {
+                    "description": "交易金额/分",
+                    "type": "integer"
+                },
+                "dn": {
+                    "description": "交易笔数",
+                    "type": "integer"
+                },
+                "dt": {
+                    "description": "交易创建时间",
+                    "type": "string"
+                },
+                "dtr": {
+                    "description": "交易人;三方钱包or收单返回的唯一编码",
+                    "type": "string"
+                },
+                "gtw": {
+                    "description": "网关",
+                    "type": "string"
+                },
+                "im": {
+                    "description": "商品类目",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/clientReq.ClientAppGoodsItemReq"
+                    }
+                },
+                "no": {
+                    "description": "订单号",
+                    "type": "string"
+                },
+                "ret": {
+                    "description": "上报时间",
+                    "type": "string"
+                },
+                "sn": {
+                    "description": "辅助ID",
+                    "type": "string"
+                },
+                "st": {
+                    "description": "交易状态",
+                    "type": "string"
+                },
+                "tp": {
+                    "description": "交易类型@wchat:微信；alipay:支付宝; other:其他",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "全球唯一识别码",
+                    "type": "string"
+                }
+            }
+        },
+        "clientReq.ClientAppGoodsItemReq": {
+            "type": "object",
+            "properties": {
+                "item": {
+                    "description": "商品类目",
+                    "type": "string"
+                },
+                "orderno": {
+                    "description": "订单号",
+                    "type": "string"
+                }
+            }
+        },
+        "clientReq.ClientAppHardwareHealthReq": {
+            "type": "object",
+            "properties": {
+                "abm": {
+                    "description": "可运行内存",
+                    "type": "number"
+                },
+                "atm": {
+                    "description": "可用存储",
+                    "type": "number"
+                },
+                "blt": {
+                    "description": "蓝牙状态@1：开启； 2：关闭",
+                    "type": "integer"
+                },
+                "cpu": {
+                    "description": "cpu使用率",
+                    "type": "number"
+                },
+                "fs": {
+                    "description": "闪光灯状态@1：开启；2：关闭",
+                    "type": "integer"
+                },
+                "hor": {
+                    "description": "喇叭状态@1：开启；2：关闭",
+                    "type": "integer"
+                },
+                "ic": {
+                    "description": "摄像头@1：开启； 2：关闭",
+                    "type": "integer"
+                },
+                "rt": {
+                    "description": "上报时间",
+                    "type": "string"
+                },
+                "sn": {
+                    "description": "辅助ID",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "全球唯一识别码",
+                    "type": "string"
+                }
+            }
+        },
+        "clientReq.ClientAppHardwareReq": {
+            "type": "object",
+            "properties": {
+                "appid": {
+                    "description": "appId服务商标识",
+                    "type": "string"
+                },
+                "bd": {
+                    "description": "主板",
+                    "type": "string"
+                },
+                "cpu": {
+                    "description": "中央处理器",
+                    "type": "string"
+                },
+                "imi": {
+                    "description": "唯一的设备ID",
+                    "type": "string"
+                },
+                "mac": {
+                    "description": "交易方设备唯一标识",
+                    "type": "string"
+                },
+                "md": {
+                    "description": "品牌",
+                    "type": "string"
+                },
+                "nw": {
+                    "description": "网卡",
+                    "type": "string"
+                },
+                "ret": {
+                    "description": "第一次上报时间",
+                    "type": "string"
+                },
+                "scs": {
+                    "description": "屏幕尺寸",
+                    "type": "string"
+                },
+                "sn": {
+                    "description": "sn唯一标识",
+                    "type": "string"
+                },
+                "tim": {
+                    "description": "总存储",
+                    "type": "number"
+                },
+                "tm": {
+                    "description": "总内存",
+                    "type": "number"
+                },
+                "usb": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/clientReq.ClientAppHardwareUsbReq"
+                    }
+                },
+                "uuid": {
+                    "description": "全球唯一识别号",
+                    "type": "string"
+                }
+            }
+        },
+        "clientReq.ClientAppHardwareUsbReq": {
+            "type": "object",
+            "properties": {
+                "d": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "n": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "p": {
+                    "description": "USB设备的PID",
+                    "type": "integer"
+                },
+                "uuid": {
+                    "description": "全球唯一识别号",
+                    "type": "string"
+                },
+                "v": {
+                    "description": "USB设备的VID",
+                    "type": "integer"
+                }
+            }
+        },
+        "clientReq.ClientAppSoftwareHealthReq": {
+            "type": "object",
+            "properties": {
+                "av": {
+                    "description": "安卓版本",
+                    "type": "string"
+                },
+                "ds": {
+                    "description": "下载速率",
+                    "type": "string"
+                },
+                "fm": {
+                    "description": "当月流量使用情况",
+                    "type": "number"
+                },
+                "ip": {
+                    "description": "ip地址",
+                    "type": "string"
+                },
+                "language": {
+                    "description": "语言",
+                    "type": "string"
+                },
+                "lat": {
+                    "description": "维度",
+                    "type": "string"
+                },
+                "lon": {
+                    "description": "经度",
+                    "type": "string"
+                },
+                "nwt": {
+                    "description": "网络类型",
+                    "type": "string"
+                },
+                "ret": {
+                    "description": "上报时间",
+                    "type": "string"
+                },
+                "rom": {
+                    "description": "ROM版本",
+                    "type": "string"
+                },
+                "scc": {
+                    "description": "sim卡ICCID(卡串号,卡的标识)",
+                    "type": "string"
+                },
+                "sgl": {
+                    "description": "信号强度",
+                    "type": "integer"
+                },
+                "sii": {
+                    "description": "sim卡IMSI(用户标识)",
+                    "type": "string"
+                },
+                "sn": {
+                    "description": "辅助ID",
+                    "type": "string"
+                },
+                "spn": {
+                    "description": "sim卡运营商",
+                    "type": "string"
+                },
+                "us": {
+                    "description": "上传速率",
+                    "type": "string"
+                },
+                "uuid": {
+                    "description": "全球唯一识别码",
+                    "type": "string"
+                },
+                "wfs": {
+                    "description": "wifi名称",
+                    "type": "string"
+                }
+            }
+        },
+        "clientReq.ExceptionReq": {
+            "type": "object",
+            "properties": {
+                "ex": {
+                    "type": "string"
+                }
+            }
+        },
+        "dbModel.Profit_device_wechat": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "terminal": {
+                    "description": "设备标识",
+                    "type": "string"
+                },
+                "uin": {
+                    "description": "微信号唯一标识",
+                    "type": "integer"
+                },
+                "wxid": {
+                    "description": "原始微信号",
+                    "type": "string"
+                }
+            }
+        },
+        "supplierReq.SupplierChangeReq": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "description": "供号人注册日期",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "供号人ID",
+                    "type": "integer"
+                },
+                "isRealName": {
+                    "description": "供号人是否实名认证 0-否 1-是",
+                    "type": "integer"
+                },
+                "isStartWx": {
+                    "description": "是否启用微信 0-否 1-是",
+                    "type": "integer"
+                },
+                "moblie": {
+                    "description": "供号人联系方式",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "状态 0-禁用 1-启用",
+                    "type": "integer"
+                },
+                "supplierName": {
+                    "description": "供号人名称",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "变更类型 0-新增 1-变更",
+                    "type": "integer"
+                }
+            }
+        },
+        "wechatReq.WechatChangeReq": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "description": "微信号",
+                    "type": "string"
+                },
+                "area": {
+                    "description": "区域",
+                    "type": "string"
+                },
+                "bindMail": {
+                    "description": "绑定邮箱",
+                    "type": "string"
+                },
+                "bindMoblie": {
+                    "description": "绑定手机号",
+                    "type": "string"
+                },
+                "bindQq": {
+                    "description": "绑定QQ",
+                    "type": "string"
+                },
+                "city": {
+                    "description": "城市",
+                    "type": "string"
+                },
+                "country": {
+                    "description": "国家",
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "第一次登录时间",
+                    "type": "integer"
+                },
+                "deleteFlag": {
+                    "description": "删除标记",
+                    "type": "integer"
+                },
+                "headImgUrl": {
+                    "description": "头像",
+                    "type": "string"
+                },
+                "isRealName": {
+                    "description": "微信号是否实名认证 0-否 1-是",
+                    "type": "integer"
+                },
+                "lastLoginIp": {
+                    "description": "最后一次登录ip",
+                    "type": "string"
+                },
+                "lastLoginTime": {
+                    "description": "最近登录时间",
+                    "type": "integer"
+                },
+                "lastLogoutTime": {
+                    "description": "最近登出时间",
+                    "type": "integer"
+                },
+                "nickName": {
+                    "description": "微信昵称",
+                    "type": "string"
+                },
+                "operatorId": {
+                    "description": "所属运营商ID",
+                    "type": "integer"
+                },
+                "operatorMobile": {
+                    "description": "所属运营商电话",
+                    "type": "string"
+                },
+                "operatorName": {
+                    "description": "所属运营商名称",
+                    "type": "string"
+                },
+                "province": {
+                    "description": "省份",
+                    "type": "string"
+                },
+                "sex": {
+                    "description": "性别",
+                    "type": "integer"
+                },
+                "smallHeadImg": {
+                    "description": "头像缩略图",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "微信号登录状态 0-离线 1-在线",
+                    "type": "integer"
+                },
+                "supplierId": {
+                    "description": "供号人ID",
+                    "type": "integer"
+                },
+                "supplierMobile": {
+                    "description": "供号人账号/电话",
+                    "type": "string"
+                },
+                "supplierName": {
+                    "description": "供号人姓名",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "变更标识 0-增加 1-更新",
+                    "type": "integer"
+                },
+                "uin": {
+                    "description": "微信号唯一标识",
+                    "type": "integer"
+                },
+                "wxid": {
+                    "description": "原始微信号",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
